@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   {% load static %}
+   <link rel="stylesheet" href="{% static 'booksstyles.css' %}">
+   <title>Books</title>
+</head>
+<body>
+   <div id="container">
+
+      <div id="header">
+         <h3>Hello, {{request.session.fname}}!</h3>
+         <a class="top" href="/logout">Log Out</a>
+      </div>
+
+      {% if messages %}
+      <ul>    
+         {% for message in messages %}    
+         <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+         {% endfor %}
+      </ul>
+      {% endif %}
+
+      <form action="/AddBook" method="POST">
+      {% csrf_token %}
+         <h3>Add a favorite book</h3>
+         <input class="entry" type="text" name="title" placeholder="Title...">
+         <textarea class="entry" rows="3" cols="50" name="desc" placeholder="Description..."></textarea>
+         <input class="button" type="Submit" value="Add Book">
+      </form>
+
+
+      <div id="books">
+         <h3>All the books:</h3>
+         {% for book in BookList %}
+            <a href="/books/{{book.id}}">{{book.title}}</a>
+            <p>(Added by {{book.uploader.fname}} {{book.uploader.lname}})</p>
+            {% if U in book.faved_by.all %}
+               <p>This is one of your favorites</p>
+            {% else %}
+               <a href="/books/fave/{{book.id}}">Add this book to favorites.</a>
+            {% endif %}
+         {% endfor %}
+      </div>
+
+   </div>
+</body>
+</html>

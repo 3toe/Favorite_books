@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   {% load static %}
+   <link rel="stylesheet" href="{% static 'editstyles.css' %}">
+   <title>Books</title>
+</head>
+<body>
+   <div id="container">
+
+      <div id="header">
+         <h2>Hello, {{request.session.fname}}!</h2>
+         <a class="top" href="/books">Back</a>
+         <a class="top" href="/logout">Log Out</a>
+      </div>
+
+      <div id="bookinfo">
+         <h3 {% if B.uploader == U %} class="uploader" {% endif %}>{{B.title}}</h3>
+         <p>Added by: {{B.uploader.fname}} {{B.uploader.lname}}</p>
+         <p>Added on: {{B.created_at}}</p>
+         <p>Last updated on: {{B.updated_at}}</p>
+         <p id="descline">Description:{% if B.uploader != U %} {{B.desc}} {% endif %}</p>
+         {% if B.uploader == U %}
+
+            {% if messages %}
+            <ul>    
+               {% for message in messages %}    
+               <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+               {% endfor %}
+            </ul>
+            {% endif %}
+
+            <form action="/books/update/{{B.id}}" method="POST">
+            {% csrf_token %}
+               <textarea class="entry" rows="3" cols="50" name="desc">{{B.desc}}</textarea>
+               <input class="button" type="Submit" name="update" value="Update">
+               <input class="button" type="Submit" name="del" value="Delete">
+            </form>
+         {% endif %}
+      </div>
+
+      <div id="likers">
+         <h3>Users who like this book:</h3>
+         <ul>
+            {% for user in favers %}
+            <li>{{user.fname}} {{user.lname}} {% if user == U %}<a href="/books/unfave/{{B.id}}">Un-favorite</a>{% endif %}</li>
+            {% endfor %}
+         </ul>
+         {% if not U in B.faved_by.all %}
+         <a href="/books/fave/{{B.id}}">Add this book to favorites.</a>
+         {% endif %}
+      </div>
+
+   </div>
+</body>
+</html>
